@@ -1,8 +1,8 @@
-brew update           # download app updated formulas
+brew update           # download updated formulas
 brew outdated         # what's old?
-brew upgrade          # upgrade everything locally
+brew upgrade          # upgrade all formulae
 # list all brew casks installed & their versions
-brew cask outdated
-brew cask upgrade
+brew outdated --cask
+brew upgrade --cask
 # cleanup everything
 brew cleanup

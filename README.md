@@ -1,41 +1,32 @@
 # Mac-M4-Pro-Setup
 
-[Zsh Plugin Manager](https://github.com/zplug/zplug)
+### This script is designed to setup MAC M4 Pro.
 
-### This script is designed to setup MAC M4 Pro.  
-
-### You won’t need Xcode to use Homebrew, but some of the software and components you’ll want to install will rely on Xcode’s Command Line Tools package.
+### You won't need Xcode to use Homebrew, but some of the software and components you'll want to install will rely on Xcode's Command Line Tools package.
 ``` xcode-select --install ```
 
-## Install Brew 
-### install homebrew
-``` curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh ```
+## Install Brew
+### Install Homebrew
+``` /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ```
 
 ### Set Path ( Note - Please change the username before use )
-``` echo 'eval $(/opt/homebrew/bin/brew shellenv)' >> /Users/ajeet/.zprofile ```
+``` echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile" ```
 
-### install cask
-``` brew install cask```
-### To check brew status 
+### To check brew status
 ``` brew doctor ```
-### homebrew cask updater: https://github.com/buo/homebrew-cask-upgrade
+
+### Homebrew cask updater: https://github.com/buo/homebrew-cask-upgrade
 ``` brew tap buo/cask-upgrade ```
 
-## add additional repos for homebrew to track, update & install
-### add cask-drivers
-``` brew tap homebrew/cask-drivers ```
-### add fonts
-``` brew tap homebrew/cask-fonts ```
-
 ### install git
-``` brew install git```
+``` brew install git ```
 
 ### install Z-Shell
-``` brew install zsh```
+``` brew install zsh ```
 
 ## OH MY ZSH
 ### install
-``` sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)" ```
+``` sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" ```
 
 ### The installation script should set zsh to your default shell, but if it doesn't you can do it manually
 ``` chsh -s $(which zsh) ```
@@ -52,7 +43,7 @@
 ### Enforce Changes
 ``` source ~/.zshrc ```
 
-### install google chrome 
+### install google chrome
 ``` brew install --cask google-chrome ```
 
 ### install node
@@ -61,9 +52,6 @@
 ### install azure-data-studio
 ``` brew install --cask azure-data-studio ```
 
-### install google chrome 
-``` brew install --cask google-chrome ```
-
 ### install docker
 ``` brew install --cask docker ```
 
@@ -71,7 +59,7 @@
 ``` brew install openjdk ```
 
 ### install microsoft-azure-storage-explorer
-``` brew install microsoft-azure-storage-explorer ```
+``` brew install --cask microsoft-azure-storage-explorer ```
 
 ### install ngrok
 ``` brew install --cask ngrok ```
@@ -85,10 +73,10 @@
 ### install sublime-text
 ``` brew install --cask sublime-text ```
 
-### install minikube 
+### install minikube
 ``` brew install minikube ```
 
-### install install terraform
+### install terraform
 ``` brew install terraform ```
 
 ### install canva

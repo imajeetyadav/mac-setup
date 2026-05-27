@@ -1,71 +1,130 @@
-#!/bin/sh
+#!/bin/bash
+set -euo pipefail
 
-# Script to setup Mac M4 (Apple Silicon)
+# Mac M4 setup script — safe to run on a new Mac or re-run on an existing one.
 
-# 1. Install Xcode Command Line Tools (needed for some packages)
-xcode-select --install
+# ── Helpers ───────────────────────────────────────────────────────────────────
+log() { echo ""; echo "══ $* ══"; }
 
-# 2. Install Homebrew
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+clone_or_pull() {
+  local repo=$1 dest=$2
+  if [[ ! -d "$dest" ]]; then
+    git clone --depth=1 "$repo" "$dest"
+  else
+    git -C "$dest" pull --ff-only
+  fi
+}
 
-echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> /Users/imajeetyadav/.zprofile
+# ── Prerequisites ─────────────────────────────────────────────────────────────
+log "Xcode Command Line Tools"
+if ! xcode-select -p &>/dev/null; then
+  xcode-select --install
+  echo "Re-run this script after Xcode CLI tools finish installing."
+  exit 0
+else
+  echo "Already installed."
+fi
+
+log "Homebrew"
+if ! command -v brew &>/dev/null; then
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+  echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+else
+  echo "Already installed."
+fi
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# 4. Update Homebrew & check
-brew doctor
+# ── Packages ──────────────────────────────────────────────────────────────────
+log "Brew Bundle"
 brew update
+brew bundle --file="$(dirname "$0")/Brewfile" --no-lock
 
-# 6. Install core tools
-brew install git
-brew install zsh
+# ── Shell Environment ─────────────────────────────────────────────────────────
+log "Oh My Zsh"
+if [[ ! -d "$HOME/.oh-my-zsh" ]]; then
+  RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+else
+  echo "Already installed."
+fi
 
-# 7. Install Oh My Zsh
-sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+log "Default Shell"
+if [[ "$SHELL" != "$(command -v zsh)" ]]; then
+  chsh -s "$(command -v zsh)"
+else
+  echo "Already zsh."
+fi
 
-# Set Zsh as default shell (if not already)
-chsh -s $(which zsh)
+log "Powerlevel10k"
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+clone_or_pull https://github.com/romkatv/powerlevel10k.git \
+  "$ZSH_CUSTOM/themes/powerlevel10k"
 
-# Reload config
-source ~/.zshrc
+log "Zsh Plugins"
+clone_or_pull https://github.com/zsh-users/zsh-autosuggestions              "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
+clone_or_pull https://github.com/zsh-users/zsh-completions                  "$ZSH_CUSTOM/plugins/zsh-completions"
+clone_or_pull https://github.com/zsh-users/zsh-history-substring-search     "$ZSH_CUSTOM/plugins/zsh-history-substring-search"
+clone_or_pull https://github.com/zdharma-continuum/fast-syntax-highlighting  "$ZSH_CUSTOM/plugins/fast-syntax-highlighting"
+clone_or_pull https://github.com/djui/alias-tips                             "$ZSH_CUSTOM/plugins/alias-tips"
+clone_or_pull https://github.com/MichaelAquilina/zsh-you-should-use          "$ZSH_CUSTOM/plugins/you-should-use"
 
-# 8. Zsh Plugins
-git clone https://github.com/zsh-users/zsh-syntax-highlighting.git \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting
+log "PATH"
+if ! grep -q 'opt/homebrew/bin' "$HOME/.zshrc" 2>/dev/null; then
+  echo 'export PATH=$PATH:/opt/homebrew/bin' >> "$HOME/.zshrc"
+else
+  echo "Already set."
+fi
 
-git clone https://github.com/zsh-users/zsh-autosuggestions \
-  ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+# ── Version Managers ──────────────────────────────────────────────────────────
+log "NVM + Node"
+export NVM_DIR="$HOME/.nvm"
+if [[ ! -s "$NVM_DIR/nvm.sh" ]]; then
+  curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/HEAD/install.sh | bash
+fi
+source "$NVM_DIR/nvm.sh"
+nvm install --lts
+nvm use --lts
 
-# Reload Zsh
-source ~/.zshrc
+log "SDKMAN + Java"
+if [[ ! -s "$HOME/.sdkman/bin/sdkman-init.sh" ]]; then
+  curl -s "https://get.sdkman.io" | bash
+fi
+source "$HOME/.sdkman/bin/sdkman-init.sh"
+sdk install java 21.0.7-tem || true
 
-# 9. Fix PATH issues
-echo 'export PATH=$PATH:/opt/homebrew/bin' >> ~/.zshrc
-source ~/.zshrc
+log "FVM + Flutter"
+fvm install stable
+fvm global stable
 
-# 10. Install Apps & Tools
+log "tfenv + Terraform"
+tfenv install latest
+tfenv use latest
 
-# Browsers
-brew install --cask google-chrome
+# ── Manual Installs ───────────────────────────────────────────────────────────
+log "Podscape"
+if [[ ! -d "/Applications/Podscape.app" ]]; then
+  PODSCAPE_URL=$(curl -fsSL https://api.github.com/repos/codingprotocols/podscape/releases/latest \
+    | jq -r '.assets[] | select(.name | test("\\.dmg$"; "i")) | .browser_download_url' \
+    | head -1)
+  if [[ -z "$PODSCAPE_URL" ]]; then
+    echo "Warning: Could not find Podscape .dmg. Check https://github.com/codingprotocols/podscape/releases"
+  else
+    TMP_DMG=$(mktemp /tmp/podscape.XXXXXX.dmg)
+    trap 'rm -f "$TMP_DMG"' EXIT
+    curl -fsSL "$PODSCAPE_URL" -o "$TMP_DMG"
+    MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -quiet | tail -1 | awk '{print $NF}')
+    APP=$(find "$MOUNT_POINT" -maxdepth 1 -name "*.app" | head -1)
+    if [[ -z "$APP" ]]; then
+      echo "Warning: No .app found in Podscape .dmg."
+    else
+      cp -r "$APP" /Applications/
+      echo "Installed."
+    fi
+    hdiutil detach "$MOUNT_POINT" -quiet
+    rm "$TMP_DMG"
+  fi
+else
+  echo "Already installed."
+fi
 
-# Dev Languages & Tools
-brew install node
-brew install go
-brew install openjdk
-brew install terraform
-brew install minikube
-brew install httpie
-
-# IDEs & Editors
-brew install --cask visual-studio-code
-brew install --cask sublime-text
-brew install --cask jetbrains-toolbox
-brew install --cask azure-data-studio
-brew install --cask postman
-
-# Cloud / Utilities
-brew install --cask docker
-brew install --cask microsoft-azure-storage-explorer
-brew install --cask ngrok   # updated, no 'cask install'
-
-# Productivity
-brew install --cask canva
+log "Done"
+echo "Open a new terminal for all changes to take effect."

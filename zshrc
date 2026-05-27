@@ -30,9 +30,8 @@ source $ZSH/oh-my-zsh.sh
 ##############################################
 #  PATH Setup
 ##############################################
-# System & Homebrew
-export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin"
-export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+# Preserve existing system PATH, then prepend tool paths
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:$PATH"
 export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/opt/php/bin:/opt/homebrew/opt/mysql-client/bin:$PATH"
 
 # Custom Tools
@@ -59,10 +58,6 @@ export PYENV_ROOT="$HOME/.pyenv"
 [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init - zsh)"
 
-# SDKMAN (⚠️ must be at the END of file)
-export SDKMAN_DIR="$HOME/.sdkman"
-[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
-
 ##############################################
 #  Shell Behavior & History
 ##############################################
@@ -79,7 +74,6 @@ setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANK
 ##############################################
 #  Completion & Navigation
 ##############################################
-# Navigation & completion behavior
 setopt auto_cd
 setopt auto_list
 setopt auto_menu
@@ -101,9 +95,8 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive
 # Custom fpaths for completions
 fpath=(~/.docker/completions $fpath)
 
-# Enable completions safely
+# Enable completions
 autoload -Uz compinit
-rm -rf ~/.zcompdump*  # rebuild cache safely
 compinit
 
 ##############################################
@@ -112,8 +105,8 @@ compinit
 # Light gray inline suggestions
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=244'
 
-# Accept autosuggestion with Tab
-bindkey '^I' autosuggest-accept
+# Accept autosuggestion with End key (right arrow also works by default)
+bindkey '^[[F' autosuggest-accept
 
 # Cycle through matching history with arrow keys
 bindkey '^[[A' history-substring-search-up
@@ -121,9 +114,6 @@ bindkey '^[[B' history-substring-search-down
 
 # Case-insensitive history search
 zstyle ':history-substring-search:*' case-sensitive 'false'
-
-# zsh-autosuggestions will show inline suggestions
-# Accept suggestion with right arrow (→)
 
 ##############################################
 #  Powerlevel10k Prompt
@@ -142,5 +132,11 @@ export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
 # Set preview window (press Tab in fzf to preview files)
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --preview "bat --style=numbers --color=always --line-range :500 {}"'
 
-# (Optional) Set Ctrl-R to use fzf for history search
-bindkey '^R' fzf-history-widget%
+# Ctrl-R uses fzf for history search
+bindkey '^R' fzf-history-widget
+
+##############################################
+#  SDKMAN (MUST be at END of file)
+##############################################
+export SDKMAN_DIR="$HOME/.sdkman"
+[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
