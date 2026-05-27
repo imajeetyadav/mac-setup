@@ -1,92 +1,100 @@
-# Mac-M4-Pro-Setup
+# Mac Setup
 
-### This script is designed to setup MAC M4 Pro.
+Automated Mac setup for Apple Silicon (M-series) machines. Run once on a fresh Mac or re-run anytime to sync new tools.
 
-### You won't need Xcode to use Homebrew, but some of the software and components you'll want to install will rely on Xcode's Command Line Tools package.
-``` xcode-select --install ```
+---
 
-## Install Brew
-### Install Homebrew
-``` /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" ```
+## Quick Start
 
-### Set Path ( Note - Please change the username before use )
-``` echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile" ```
+```bash
+# 1. Clone this repo
+git clone https://github.com/imajeetyadav/mac-setup.git ~/Projects/mac-setup
+cd ~/Projects/mac-setup
 
-### To check brew status
-``` brew doctor ```
-
-### Homebrew cask updater: https://github.com/buo/homebrew-cask-upgrade
-``` brew tap buo/cask-upgrade ```
-
-### install git
-``` brew install git ```
-
-### install Z-Shell
-``` brew install zsh ```
-
-## OH MY ZSH
-### install
-``` sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" ```
-
-### The installation script should set zsh to your default shell, but if it doesn't you can do it manually
-``` chsh -s $(which zsh) ```
-
-### To apply the changes you make you need to either start new shell instance or run
-``` source ~/.zshrc ```
-
-### zsh-syntax-highlighting
-``` git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting ```
-
-### zsh-autosuggestions
-``` git clone https://github.com/zsh-users/zsh-autosuggestions $ZSH_CUSTOM/plugins/zsh-autosuggestions ```
-
-### Enforce Changes
-``` source ~/.zshrc ```
-
-### install google chrome
-``` brew install --cask google-chrome ```
-
-### install node
-``` brew install node ```
-
-### install azure-data-studio
-``` brew install --cask azure-data-studio ```
-
-### install docker
-``` brew install --cask docker ```
-
-### install java
-``` brew install openjdk ```
-
-### install microsoft-azure-storage-explorer
-``` brew install --cask microsoft-azure-storage-explorer ```
-
-### install ngrok
-``` brew install --cask ngrok ```
-
-### install postman
-``` brew install --cask postman ```
-
-### install visual studio code
-``` brew install --cask visual-studio-code ```
-
-### install sublime-text
-``` brew install --cask sublime-text ```
-
-### install minikube
-``` brew install minikube ```
-
-### install terraform
-``` brew install terraform ```
-
-### install canva
-``` brew install --cask canva ```
-
-
-
-You can also display the app switcher on all monitors with the following undocumented preference:
+# 2. Run the setup script
+bash quick-mac-setup.sh
 ```
+
+The script is idempotent — safe to re-run on an existing machine.
+
+---
+
+## What Gets Installed
+
+### Prerequisites (auto-handled)
+- **Xcode Command Line Tools** — required by Homebrew and many packages
+- **Homebrew** — package manager for macOS
+
+### Shell
+| Tool | Description |
+|------|-------------|
+| Oh My Zsh | Zsh framework |
+| Powerlevel10k | Fast, customizable prompt |
+| zsh-autosuggestions | Fish-like command suggestions |
+| zsh-completions | Additional completions |
+| zsh-history-substring-search | History search with Up/Down |
+| fast-syntax-highlighting | Syntax highlighting in terminal |
+| alias-tips | Reminds you of existing aliases |
+| zsh-you-should-use | Nudges you to use your aliases |
+
+### Version Managers
+| Tool | Installs |
+|------|----------|
+| NVM | Node.js LTS |
+| SDKMAN | Java 21 (Temurin) |
+| FVM | Flutter (stable) |
+| tfenv | Terraform (latest) |
+
+### CLI Tools (via Brewfile)
+
+**Cloud & Infrastructure**
+`awscli`, `azure-cli`, `doctl`, `gcloud-cli`, `eksctl`, `helm`, `helmfile`, `kustomize`, `kubectl`, `kubectx`, `k9s`, `argocd`, `flux`, `terraform-docs`, `terragrunt`, `tflint`, `tfsec`, `terrascan`, `tfenv`, `hcledit`, `vault`, `steampipe`, `komiser`, `inframap`, `localstack-cli`
+
+**Security**
+`grype`, `trivy`, `trufflehog`, `kubescape`, `checkov`, `prowler`, `cosign`, `sops`, `talisman`, `gnupg`
+
+**Containers & Kubernetes**
+`minikube`, `ko`, `skopeo`, `pack`, `popeye`, `kubeshark`, `kubespy`, `stern`, `kargo`, `krr`
+
+**Development**
+`git`, `gh`, `go`, `rust`, `python@3.12/3.13/3.14`, `node` (via NVM), `ruby`, `php`, `composer`, `uv`, `pipenv`, `pyenv`, `sdkman-cli`, `fastlane`, `cocoapods`, `ios-deploy`, `act`, `pre-commit`
+
+**Databases**
+`mongosh`, `mongodb-database-tools`, `redis`, `mysql-client`, `pgcli`, `libpq`, `msodbcsql18`, `mssql-tools18`
+
+**Utilities**
+`bat`, `fzf`, `jq`, `yq`, `ripgrep`, `wget`, `watch`, `tree`, `lnav`, `goaccess`, `httpie`, `nmap`, `netcat`, `k6`, `imagemagick`, `ffmpeg`, `graphviz`
+
+### Applications (via Brewfile)
+`iterm2`, `visual-studio-code`, `jetbrains-toolbox`, `github`, `postman`, `bruno`, `brave-browser`, `slack`, `notion`, `zoom`, `microsoft-teams`, `docker` (via Docker Desktop), `mysqlworkbench`, `stats`, `appcleaner`, `betterdisplay`, `canva`, `vlc`, `ngrok`, `openvpn-connect`, `miniforge`, `comfyui`, `claude-code`, `bootstrap-studio`
+
+### VS Code Extensions
+Includes extensions for: Python, Go, Java, Flutter/Dart, JavaScript/TypeScript, Kubernetes, Terraform, Azure, AWS, Docker, GitHub Copilot, databases, and more. See `Brewfile` for the full list.
+
+---
+
+## Manual Steps
+
+### Restore Zsh config
+Copy `zshrc` from this repo to `~/.zshrc`:
+```bash
+cp zshrc ~/.zshrc
+source ~/.zshrc
+```
+
+### App Switcher on all displays
+```bash
 defaults write com.apple.dock appswitcher-all-displays -bool true
 killall Dock
 ```
-This works on Monterey, Big Sur, Catalina, Mojave, and possibly older versions as well.
+
+---
+
+## Files
+
+| File | Purpose |
+|------|---------|
+| `quick-mac-setup.sh` | Main setup script |
+| `Brewfile` | All Homebrew packages, casks, and VS Code extensions |
+| `zshrc` | Zsh configuration |
+| `update-commands.txt` | Useful commands for keeping tools up to date |
