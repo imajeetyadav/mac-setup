@@ -100,6 +100,25 @@ tfenv install latest
 tfenv use latest
 
 # ── Manual Installs ───────────────────────────────────────────────────────────
+log "UTM"
+if [[ ! -d "/Applications/UTM.app" ]]; then
+  TMP_DMG=$(mktemp /tmp/utm.XXXXXX.dmg)
+  trap 'rm -f "$TMP_DMG"' EXIT
+  curl -fsSL "https://github.com/utmapp/UTM/releases/latest/download/UTM.dmg" -o "$TMP_DMG"
+  MOUNT_POINT=$(hdiutil attach "$TMP_DMG" -nobrowse -quiet | tail -1 | awk '{print $NF}')
+  APP=$(find "$MOUNT_POINT" -maxdepth 1 -name "*.app" | head -1)
+  if [[ -z "$APP" ]]; then
+    echo "Warning: No .app found in UTM .dmg."
+  else
+    cp -r "$APP" /Applications/
+    echo "Installed."
+  fi
+  hdiutil detach "$MOUNT_POINT" -quiet
+  rm "$TMP_DMG"
+else
+  echo "Already installed."
+fi
+
 log "Podscape"
 if [[ ! -d "/Applications/Podscape.app" ]]; then
   PODSCAPE_URL=$(curl -fsSL https://api.github.com/repos/codingprotocols/podscape/releases/latest \

@@ -68,6 +68,12 @@ The script is idempotent — safe to re-run on an existing machine.
 ### Applications (via Brewfile)
 `iterm2`, `visual-studio-code`, `jetbrains-toolbox`, `github`, `postman`, `bruno`, `brave-browser`, `slack`, `notion`, `zoom`, `microsoft-teams`, `docker` (via Docker Desktop), `mysqlworkbench`, `stats`, `appcleaner`, `betterdisplay`, `canva`, `vlc`, `ngrok`, `openvpn-connect`, `miniforge`, `comfyui`, `claude-code`, `bootstrap-studio`
 
+### Applications (via direct DMG install)
+| App | Source |
+|-----|--------|
+| UTM | GitHub releases (`utmapp/UTM`) — QEMU-based VM runner for Apple Silicon |
+| Podscape | GitHub releases (`codingprotocols/podscape`) |
+
 ### VS Code Extensions
 Includes extensions for: Python, Go, Java, Flutter/Dart, JavaScript/TypeScript, Kubernetes, Terraform, Azure, AWS, Docker, GitHub Copilot, databases, and more. See `Brewfile` for the full list.
 
