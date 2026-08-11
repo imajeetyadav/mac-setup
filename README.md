@@ -36,6 +36,9 @@ The script is idempotent — safe to re-run on an existing machine.
 | fast-syntax-highlighting | Syntax highlighting in terminal |
 | alias-tips | Reminds you of existing aliases |
 | zsh-you-should-use | Nudges you to use your aliases |
+| MesloLGS NF font | Nerd Font required for Powerlevel10k icons |
+
+The script also installs `zshrc` from this repo to `~/.zshrc` (backing up any existing file first).
 
 ### Version Managers
 | Tool | Installs |
@@ -81,12 +84,9 @@ Includes extensions for: Python, Go, Java, Flutter/Dart, JavaScript/TypeScript, 
 
 ## Manual Steps
 
-### Restore Zsh config
-Copy `zshrc` from this repo to `~/.zshrc`:
-```bash
-cp zshrc ~/.zshrc
-source ~/.zshrc
-```
+### Terminal font
+Set your terminal font to **MesloLGS NF** so Powerlevel10k icons render
+(iTerm2/Terminal: Profiles → Text → Font), then run `p10k configure`.
 
 ### App Switcher on all displays
 ```bash

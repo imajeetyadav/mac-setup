@@ -25,6 +25,20 @@ plugins=(
   zsh-history-substring-search  # LAST
 )
 
+##############################################
+#  Completion styles (must be set BEFORE oh-my-zsh runs compinit)
+##############################################
+zstyle ':completion:*' menu select
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%B%d%b'
+zstyle ':completion:*:messages' format '%F{yellow}%d%f'
+zstyle ':completion:*:warnings' format '%F{red}No matches for: %d%f'
+zstyle ':completion:::::' completer _expand _complete _ignored _approximate
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'  # case-insensitive
+
+# Custom fpaths for completions (before oh-my-zsh so its compinit picks them up)
+fpath=(~/.docker/completions $fpath)
+
 source $ZSH/oh-my-zsh.sh
 
 ##############################################
@@ -33,9 +47,10 @@ source $ZSH/oh-my-zsh.sh
 # Preserve existing system PATH, then prepend tool paths
 export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:$PATH"
 export PATH="/opt/homebrew/opt/ruby/bin:/opt/homebrew/opt/php/bin:/opt/homebrew/opt/mysql-client/bin:$PATH"
+export PATH=/opt/homebrew/share/google-cloud-sdk/bin:"$PATH"
 
 # Custom Tools
-export PATH="$HOME/bin:$HOME/.local/bin:$HOME/.docker/bin:$HOME/.lmstudio/bin:$HOME/bin/csvlint:$PATH"
+export PATH="$HOME/bin:$HOME/.local/bin:$HOME/.docker/bin:$HOME/.lmstudio/bin:$PATH"
 
 # Bun
 export BUN_INSTALL="$HOME/.bun"
@@ -43,7 +58,11 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 
 # Android SDK
 export ANDROID_HOME="$HOME/Library/Android/sdk"
-export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/platform-tools:$PATH"
+export PATH="$ANDROID_HOME/emulator:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
+
+# MySQL client build flags
+export LDFLAGS="-L/opt/homebrew/opt/mysql-client/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/mysql-client/include"
 
 ##############################################
 #  Development Tools
@@ -69,10 +88,10 @@ SAVEHIST=10000
 HISTFILE=~/.zsh_history
 
 setopt SHARE_HISTORY INC_APPEND_HISTORY
-setopt HIST_IGNORE_DUPS HIST_IGNORE_SPACE HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANKS EXTENDED_HISTORY
+setopt HIST_IGNORE_SPACE HIST_IGNORE_ALL_DUPS HIST_REDUCE_BLANKS EXTENDED_HISTORY
 
 ##############################################
-#  Completion & Navigation
+#  Navigation
 ##############################################
 setopt auto_cd
 setopt auto_list
@@ -82,22 +101,6 @@ setopt menu_complete
 unsetopt flowcontrol
 setopt correct
 setopt interactive_comments
-
-# Completion styles
-zstyle ':completion:*' menu select
-zstyle ':completion:*' group-name ''
-zstyle ':completion:*:descriptions' format '%B%d%b'
-zstyle ':completion:*:messages' format '%F{yellow}%d%f'
-zstyle ':completion:*:warnings' format '%F{red}No matches for: %d%f'
-zstyle ':completion:::::' completer _expand _complete _ignored _approximate
-zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive
-
-# Custom fpaths for completions
-fpath=(~/.docker/completions $fpath)
-
-# Enable completions
-autoload -Uz compinit
-compinit
 
 ##############################################
 #  History-based autocomplete tweaks
@@ -126,14 +129,17 @@ zstyle ':history-substring-search:*' case-sensitive 'false'
 export HOMEBREW_NO_AUTO_UPDATE=1
 export HOMEBREW_NO_ENV_HINTS=1
 
+##############################################
+#  fzf (fuzzy finder)
+##############################################
+# Shell integration: defines widgets and binds Ctrl-R (history), Ctrl-T (files), Alt-C (cd)
+source <(fzf --zsh)
+
 # Use ripgrep (rg) instead of find for fzf (faster, respects .gitignore)
 export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git/*"'
 
 # Set preview window (press Tab in fzf to preview files)
 export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --preview "bat --style=numbers --color=always --line-range :500 {}"'
-
-# Ctrl-R uses fzf for history search
-bindkey '^R' fzf-history-widget
 
 ##############################################
 #  SDKMAN (MUST be at END of file)

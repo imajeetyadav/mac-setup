@@ -37,7 +37,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # ── Packages ──────────────────────────────────────────────────────────────────
 log "Brew Bundle"
 brew update
-brew bundle --file="$(dirname "$0")/Brewfile" --no-lock
+brew bundle --file="$(dirname "$0")/Brewfile"
 
 # ── Shell Environment ─────────────────────────────────────────────────────────
 log "Oh My Zsh"
@@ -59,6 +59,19 @@ ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 clone_or_pull https://github.com/romkatv/powerlevel10k.git \
   "$ZSH_CUSTOM/themes/powerlevel10k"
 
+log "MesloLGS NF Font (for Powerlevel10k icons)"
+# Set this font in your terminal profile (iTerm2/Terminal: Profiles -> Text -> Font)
+for style in "Regular" "Bold" "Italic" "Bold Italic"; do
+  font="MesloLGS NF ${style}.ttf"
+  if [[ ! -f "$HOME/Library/Fonts/$font" ]]; then
+    curl -fsSL "https://github.com/romkatv/powerlevel10k-media/raw/master/${font// /%20}" \
+      -o "$HOME/Library/Fonts/$font"
+    echo "Installed: $font"
+  else
+    echo "Already installed: $font"
+  fi
+done
+
 log "Zsh Plugins"
 clone_or_pull https://github.com/zsh-users/zsh-autosuggestions              "$ZSH_CUSTOM/plugins/zsh-autosuggestions"
 clone_or_pull https://github.com/zsh-users/zsh-completions                  "$ZSH_CUSTOM/plugins/zsh-completions"
@@ -67,11 +80,16 @@ clone_or_pull https://github.com/zdharma-continuum/fast-syntax-highlighting  "$Z
 clone_or_pull https://github.com/djui/alias-tips                             "$ZSH_CUSTOM/plugins/alias-tips"
 clone_or_pull https://github.com/MichaelAquilina/zsh-you-should-use          "$ZSH_CUSTOM/plugins/you-should-use"
 
-log "PATH"
-if ! grep -q 'opt/homebrew/bin' "$HOME/.zshrc" 2>/dev/null; then
-  echo 'export PATH=$PATH:/opt/homebrew/bin' >> "$HOME/.zshrc"
+log "Zsh Config"
+if ! cmp -s "$(dirname "$0")/zshrc" "$HOME/.zshrc" 2>/dev/null; then
+  if [[ -f "$HOME/.zshrc" ]]; then
+    cp "$HOME/.zshrc" "$HOME/.zshrc.backup-$(date +%Y-%m-%d-%H%M%S)"
+    echo "Backed up existing ~/.zshrc"
+  fi
+  cp "$(dirname "$0")/zshrc" "$HOME/.zshrc"
+  echo "Installed ~/.zshrc from repo."
 else
-  echo "Already set."
+  echo "Already up to date."
 fi
 
 # ── Version Managers ──────────────────────────────────────────────────────────
