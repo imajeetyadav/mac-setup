@@ -24,7 +24,7 @@ Every stage is idempotent — safe to re-run on an existing machine.
 |-------|----------|
 | `scripts/01-prerequisites.sh` | Xcode CLI Tools + Homebrew |
 | `scripts/02-packages.sh` | Brewfile (formulae, casks, VS Code extensions) |
-| `scripts/03-shell.sh` | Oh My Zsh, Powerlevel10k + fonts, plugins, `~/.zshrc` |
+| `scripts/03-shell.sh` | Oh My Zsh, Powerlevel10k + fonts, plugins, `~/.zshrc`, `~/.p10k.zsh` |
 | `scripts/04-version-managers.sh` | NVM/Node, SDKMAN/Java, FVM/Flutter, tfenv/Terraform |
 | `scripts/05-apps.sh` | DMG installs (UTM, Podscape) |
 | `scripts/06-macos-defaults.sh` | macOS system preferences |
@@ -98,7 +98,8 @@ Includes extensions for: Python, Go, Java, Flutter/Dart, JavaScript/TypeScript, 
 
 ### Terminal font
 Set your terminal font to **MesloLGS NF** so Powerlevel10k icons render
-(iTerm2/Terminal: Profiles → Text → Font), then run `p10k configure`.
+(iTerm2/Terminal: Profiles → Text → Font). The prompt config is restored
+automatically; run `p10k configure` only if you want to restyle it.
 
 ---
 
@@ -111,4 +112,5 @@ Set your terminal font to **MesloLGS NF** so Powerlevel10k icons render
 | `scripts/common.sh` | Shared helpers sourced by every stage |
 | `Brewfile` | All Homebrew packages, casks, and VS Code extensions |
 | `zshrc` | Zsh configuration |
+| `p10k.zsh` | Powerlevel10k prompt configuration (from `p10k configure`) |
 | `update-commands.txt` | Useful commands for keeping tools up to date |

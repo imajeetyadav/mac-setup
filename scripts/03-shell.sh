@@ -55,3 +55,15 @@ if ! cmp -s "$REPO_DIR/zshrc" "$HOME/.zshrc" 2>/dev/null; then
 else
   echo "Already up to date."
 fi
+
+log "Powerlevel10k Config"
+if ! cmp -s "$REPO_DIR/p10k.zsh" "$HOME/.p10k.zsh" 2>/dev/null; then
+  if [[ -f "$HOME/.p10k.zsh" ]]; then
+    cp "$HOME/.p10k.zsh" "$HOME/.p10k.zsh.backup-$(date +%Y-%m-%d-%H%M%S)"
+    echo "Backed up existing ~/.p10k.zsh"
+  fi
+  cp "$REPO_DIR/p10k.zsh" "$HOME/.p10k.zsh"
+  echo "Installed ~/.p10k.zsh from repo."
+else
+  echo "Already up to date."
+fi
